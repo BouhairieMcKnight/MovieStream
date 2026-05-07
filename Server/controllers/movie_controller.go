@@ -427,6 +427,7 @@ func SearchMovies(client *mongo.Client) gin.HandlerFunc {
 		if term := c.Query("term"); term != "" {
 			filter = append(filter, bson.E{Key: "title", Value: bson.D{
 				{Key: "$regex", Value: term},
+				{Key: "$options", Value: "i"},
 			}})
 		}
 		if pageNum, err := strconv.ParseInt(c.Query("page"), 10, 64); err != nil {
