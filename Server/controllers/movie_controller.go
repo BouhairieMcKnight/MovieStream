@@ -409,13 +409,13 @@ func SearchMovies(client *mongo.Client) gin.HandlerFunc {
 		var ctx, cancel = context.WithTimeout(c, 100*time.Second)
 		defer cancel()
 
-		var movieSize int64 = 6
+		var movieSize int64 = 15
 
 		filter := bson.D{}
-		opts := options.Find()
+		opts := options.Find().SetLimit(movieSize)
 
 
-		if sort := c.Param("page"); sort != "" {
+		if sort := c.Query("page"); sort != "" {
 			if sort == "asc" {
 				opts.SetSort(bson.D{{Key: "ranking.ranking_value", Value: 1}})
 			}
@@ -424,16 +424,20 @@ func SearchMovies(client *mongo.Client) gin.HandlerFunc {
 			}
 		}
 
-		if term := c.Param("searchTerm"); term != "" {
+		if term := c.Query("term"); term != "" {
 			filter = append(filter, bson.E{Key: "title", Value: bson.D{
 				{Key: "$regex", Value: term},
 			}})
 		}
-		if pageNum, err := strconv.ParseInt(c.Param("page"), 10, 64); err != nil {
+		if pageNum, err := strconv.ParseInt(c.Query("page"), 10, 64); err != nil {
 			opts.SetSkip(pageNum * movieSize)
 		}
-		if genre, err := strconv.ParseInt(c.Param("genre"), 10, 64); err != nil {
-			filter = append(filter, bson.E{Key: "genre.genre_id", Value: genre})
+		if genre := c.Query("genre"); genre != "" {
+			filter = append(filter, bson.E{Key: "genre", Value: bson.D{
+				{Key: "$elemMatch", Value: bson.D{
+					{Key: "genre_name", Value: genre},
+				}},
+			}})
 		}
 
 		var movieCollection *mongo.Collection = persistence.OpenCollection("movies", client)
@@ -444,23 +448,15 @@ func SearchMovies(client *mongo.Client) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not open database", "details": err.Error()})
 		}
 
-		opts = opts.SetLimit(movieSize)
-
 		defer cursor.Close(ctx)
 
 		var movies []domain.Movie
-		var movieResponse dtos.MovieSearchDto
 		if err = cursor.All(ctx, &movies); err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Could not find any movies in database", "details": err.Error()})
 			return
 		}
-
-		movieResponse = dtos.MovieSearchDto{
-			Movies: movies,
-			GenreName: c.Param("genre"),
-		}
 		
-		c.JSON(http.StatusOK, movieResponse)
+		c.JSON(http.StatusOK, movies)
 	}
 }
 

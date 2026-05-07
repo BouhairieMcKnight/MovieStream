@@ -38,7 +38,7 @@ func main() {
 			log.Println("Allowed Origin:", origins[i])
 		}
 	} else {
-		origins = []string{"http://localhost:5173", "http://localhost:4200"}
+		origins = []string{"http://localhost:5173", "http://localhost:4200", "*"}
 		log.Println("Allowed Origin: http://localhost:5173")
 	}
 

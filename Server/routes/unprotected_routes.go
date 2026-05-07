@@ -8,12 +8,12 @@ import (
 
 
 func SetupUnprotectedRoutes(router *gin.Engine, client *mongo.Client) {
-	router.GET("movies/movies", controller.GetMovies(client))
-	router.POST("user/register", controller.RegisterUser(client))
+	router.GET("/movies/movies", controller.GetMovies(client))
+	router.POST("/users/register", controller.RegisterUser(client))
 	router.GET("/movies/search", controller.SearchMovies(client))
 	router.GET("/movies/trending", controller.GetTrendingMovies(client))
-	router.POST("user/login", controller.LoginUser(client))
-	router.POST("user/logout", controller.Logout(client))
-	router.GET("movies/genres", controller.GetGenres(client))
-	router.POST("user/refresh", controller.RefreshTokenHandler(client))
+	router.POST("/users/login", controller.LoginUser(client))
+	router.POST("/users/logout", controller.Logout(client))
+	router.GET("/movies/genres", controller.GetGenres(client))
+	router.POST("/users/refresh", controller.RefreshTokenHandler(client))
 }

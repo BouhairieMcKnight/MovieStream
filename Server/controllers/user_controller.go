@@ -196,7 +196,6 @@ func RefreshTokenHandler(client *mongo.Client) gin.HandlerFunc {
 	}
 }
 
-
 func Logout(client *mongo.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
