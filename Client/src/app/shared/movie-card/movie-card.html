@@ -1,5 +1,5 @@
 @if (movie && movie._id) {
-  <div class="me-2 movie" (click)="movieStreamService.openMoreInfos(movie)"
+  <div class="me-2 movie"
        [style.background-image]="this.movieStreamService.getImageURL(movie.poster_path, 'w200')">
     <div class="placeholder-poster"></div>
   </div>
