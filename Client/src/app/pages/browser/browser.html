@@ -1,0 +1,28 @@
+<!-- component -->
+<div class="d-flex align-items-center ms-5 overflow-x-auto container-movies relative" >
+  @if (movieStreamService.genres().value) {
+    <app-navbar/>
+        @for (genre of movieStreamService.genres().value; track genre.genre_name) {
+          <app-movie-carousel [title]="genre.genre_name" (openModal)="openModal($event)"/>
+        }
+
+      @if (isModalOpen() && movie) {
+        <app-movie-info (closeModal)="closeModal()">
+          <ng-container modal-image>
+            <img [src]="movieStreamService.getImageURL(movie.poster_path, 'w500')" alt="">
+          </ng-container>
+          <ng-container modal-body>
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-3">
+                <span class="badge bg-primary text-xs">Released: {{movie.release_date}}</span>
+                <span class="badge bg-primary">Original language: {{movie.original_language}}</span>
+                <span class="badge bg-primary">Popularity: {{movie.ranking.ranking_name}}</span>
+              </div>
+              <h5>Overview</h5>
+              <p class="card-text">{{movie.admin_review}}</p>
+            </div>
+          </ng-container>
+        </app-movie-info>
+      }
+  }
+</div>
